@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const controllers = require('./controllers')
-
+const routes = require("./routes")
 const app = express();
 const PORT = 4000;
 
@@ -11,7 +11,10 @@ app.use(cors()); // to prevent cors errors, open access to all origins
 app.use(express.json()); // parse json bodies
 app.use(morgan('dev')); // logging
 app.use('/packages', controllers.package)
-// app.use('/user', controllers.user)
+app.use('/packages', routes.package)
+app.use('/user', controllers.user)
+app.use("/user", routes.user)
+// app.use("/api/user", routes.user) why did he use api in here 
 
 
 

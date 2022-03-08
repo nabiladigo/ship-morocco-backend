@@ -22,8 +22,12 @@ const packageSchema = new mongoose.Schema(
         },
         trackingNumber:{
             type: Number,
-            // required: true
         },
+        //      user: {
+        //   type: mongoose.Schema.Types.ObjectId,
+        //   required: true,
+        //   ref: "User",
+        // },
     },
     {
         timestamps :true,
@@ -31,6 +35,7 @@ const packageSchema = new mongoose.Schema(
 );
 
 const Package= mongoose.model('Package', packageSchema);
+
 module.exports = Package;
 
 // class Collection {

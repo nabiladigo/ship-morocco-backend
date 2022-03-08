@@ -1,92 +1,57 @@
-const express = require("express");
-const router = express.Router();
+const asyncHandler = require("express-async-handler")
+const { User } = require("../models");
+// const generateToken = require("../utils/generatToken.js") thin need to be add in the folders
 
-// const bcrypt = require("bcryptjs");
-const { User } = require("../models/index");
 
-router.get("/register", function (req, res) {
-    return res.json("register");
-});
+// Auth the user and login
 
-router.post("/register", async function (req, res) {
-    try {
-        // step check if user exists
-        const foundUser = await User.exists({ email: req.body.email });
-        // if so redirect to login
-        if (foundUser) {
-            console.log("This is not the Blue Devil way, stop creating multiple accounts!")
-            return res.redirect("/login");
-        }
-        // if not create user and redirect to login
-    
-        // salt will created a more complicated hash
-        const salt = await bcrypt.genSalt(12);
-        // hash will convert our password into something more secure
-        // test1234 => "$2a$10$5vR9VhGpkARz6EFPdkuNQ.aZNRGUgSCNSKEb9Xp1IKzrfxYETlkB2"
-        const hash = await bcrypt.hash(req.body.password, salt);
-    
-        req.body.password = hash;
-    
-        // create user in database
-        const newUser = await User.create(req.body);
-        console.log(newUser);
-    
-        return res.redirect("/login");
-        } catch (err) {
-            console.log(err);
-            return res.send(err);
-        }
-});
-
-router.get("/login", function (req, res) {
-    res.render("login");
-});
-
-router.post("/login", async function (req, res) {
-    try {
-        // check if the user exists
-        const foundUser = await User.findOne({ email: req.body.email });
-        console.log(`foundUser object is ${foundUser}`);
-        // if not
-        // redirect to register
-        if (!foundUser) return res.send("Either the username or the password is incorrect");
-
-        // if the user exists
-        // validate the user if passwords match -> login
-        // .compare(body password, hashed password) => return true or false
-        const match = await bcrypt.compare(req.body.password, foundUser.password);
-
-        // if not match send error
-        if (!match) return res.send("Either the username or the password is incorrect");
-
-        console.log(`The before version of req.session.currentUser is: ${req.session.currentUser}`)
-
-        // if match create the session and redirect to home\
-        // here we have created the key card
-        req.session.currentUser = {
-            id: foundUser._id,
-            username: foundUser.username,
-        };
-
-        console.log(req.session.currentUser)
-
-        return res.redirect("/packages");
-    } catch (err) {
-        console.log(err);
-        res.send(err);
+const authUser = asyncHandler(async(req, res) =>{
+    const { email, password } = req.body;
+    const user = await User.findOne({email});
+    if (user && (await user.matchPassword(password))) {
+        res.json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            pic: user.pic,
+            // token: generateToken(user._id),
+    });
+    }else{
+        res.status(401)
+        // 401 unauthorized   
+         throw new Error("Invalid Email or Password");
     }
 });
 
-router.get("/logout", async function (req, res) {
-    try {
-        
-        await req.session.destroy();
-        return res.redirect("/login");
+// register new user
 
-    } catch (error) {
-        console.log(error);
-        return res.send(error);
-    }
+const registerUser = asyncHandler(async (req, res) => {
+  const { username, email, password, image } = req.body;
+
+  const userExists = await User.findOne({ email });
+
+  if (userExists) {
+    // need to be redirected to login
+    res.status(400).json("User already exists");
+    // throw new Error("User already exists");
+    // res.json("/login")
+  }
+
+  const newUser = await User.create(req.body);
+
+  if (newUser) {
+    res.status(201).json({
+      _id: newUser._id,
+      username: newUser.username,
+      email: newUser.email,
+      image: newUser.image,
+    //   token: generateToken(user._id),
+    });
+    // res.status(201).json("user added!")
+    // need to be redirected to login
+
+  } else {
+    res.status(400).json("User not found");
+    // throw new Error("User not found");
+  }
 });
-
-module.exports = router;
