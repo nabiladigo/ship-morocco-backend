@@ -1,17 +1,16 @@
 const express = require('express');
 const router = express.Router();
-// const {Package} =require('../models');
+
+
 const db = require('../models');
 
-router.get('/', async(req, res, next ) => {
-  try{
-    const packages = await db.Package.find({});
-    const context = { packages }
-    return res.render('index.ejs', context);
-  }catch (error){
-    console.log(error);
-    req.error = error;
-    return next();
+router.get("/packages", async (req, res) => {
+  try {
+    // send all people
+    res.json(await Package.find({}));
+  } catch (error) {
+    //send error
+    res.status(400).json(error);
   }
 });
 

@@ -1,72 +1,89 @@
 const express = require('express');
-const methodOverride = require('method-override');
-// const packages = require('./models/package_model');
-const packageController = require('./controllers/package_controller');
+const cors = require("cors");
+const morgan = require("morgan");
+const mongoose = require("mongoose");
+const { Package } = require('./models');
+// const controllers = require('./controllers')
+
+require('dotenv').config();
+
 const app = express();
-// const cors = require("cors");
-// const morgan = require("morgan");
-// const session = require("express-session");
-// const MongoStore = require("connect-mongo");
-
 const {PORT = 4000, MONGODB_URL} = process.env;
-	
-app.set('view engine', 'ejs')	
 
-// for session
-// app.use(
-//     session(
-//         {
-//         // where to store the sessions in mongodb
-//         store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
+app.use(cors()); // to prevent cors errors, open access to all origins
+app.use(express.json()); // parse json bodies
+app.use(morgan("dev")); // logging
+// app.use('/packages', controllers.package)
 
-//         // secret key is used to sign every cookie to say its is valid
-//         secret: "super secret",
-//         resave: false,
-//         saveUninitialized: false,
-//         // configure the experation of the cookie
-//         cookie: {
-//             maxAge: 1000 * 60 * 60 * 24 * 7 * 2, // two weeks
-//         },
-//         }
-//     )
-// );
+// database connection 
 
-app.use(express.static('public'));
-app.use(express.urlencoded({extended: false}));
-app.use(methodOverride('_method'));
+mongoose.connect(MONGODB_URL,{ 
+        useNewUrlParser: true
+        , useUnifiedTopology: true
+    }
+);
 
-app.use('/packages', packageController);
-
-// app.use((req, res, next) => {
-//     const err = new Error('Not Found');
-//     err.status = 404;
-//     next(err);
-//   });
-
-// user controllers
-// app.use('/', controllers.user)
-
-// app.use(cors()); // to prevent cors errors, open access to all origins
-// app.use(morgan("dev")); // logging
-// app.use(express.json()); // parse json bodies
+mongoose.connection
+.on('open', () => console.log(`[${new Date().toLocaleTimeString()}] - MongoDB connected ... 🙌 🙌 🙌`))
+.on('close', () => console.log('MongoDB disconnected  ⚡️ 🔌 ⚡️'))
+.on('error', (error) => console.log('MongoDB connection error 😥', error));
 
 
-// app.use((req, res, next) => {    
-//     console.log("I'm running for another new route")
-// 	console.log(`${req.method} ${req.originalUrl}`);    
-// 	next();
-// });
+// routes
 
+app.get("/", (req, res) => {
+    res.send("hello world");
+  });
 
-app.get('/', function(req, res) { 
-     res.redirect('/Hello World!');
-});
+  app.get("/packages", async (req, res) => {
+    try {
+      // send all people
+      res.json(await Package.find({}));
+    } catch (error) {
+      //send error
+      res.status(400).json(error);
+    }
+  });
 
-app.get("/*", (req, res) => {
-    const context = { error: req.error };
-    return res.status(404).render("404", context);
-});
+  app.post("/packages", async (req, res) => {
+    try {
+     
+      res.json(await Package.create(req.body));
+    } catch (error) {
+     
+      res.status(400).json(error);
+    }
+  });
 
+  app.put("/packages/:id", async (req, res) => {
+    try {
+      // send all people
+      res.json(
+        await Package.findByIdAndUpdate(req.params.id, req.body, { new: true })
+      );
+    } catch (error) {
+      //send error
+      res.status(400).json(error);
+    }
+  });
+
+  app.delete("/packages/:id", async (req, res) => {
+    try {
+      // send all people
+      res.json(await Package.findByIdAndRemove(req.params.id));
+    } catch (error) {
+      //send error
+      res.status(400).json(error);
+    }
+  });
+
+  app.get("/packages/:id", async (req, res) => {
+    try {
+        res.json(await Package.findOne({"_id": req.params.id}));
+    } catch(err) {
+        res.status(400).json(error);
+    }
+  });
 	
 // Tell the app to listen on port 4000
 app.listen(PORT, () =>

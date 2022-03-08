@@ -7,7 +7,7 @@ const packageSchema = new mongoose.Schema({
     },
     image:{
         type: String,
-        required: [true, 'image can not be empty']
+        // required: [true, 'image can not be empty']
     },
     price: {
         type: Number,
@@ -18,7 +18,12 @@ const packageSchema = new mongoose.Schema({
         type: Number,
         min: [0, 'you can not add a negative number'],
         required: [true, 'price can not be empty'],
-        }
+    },
+    TrackingNumber:{
+        type: Number,
+        // required: true
+    }
+
 });
 
 const Package= mongoose.model('Package', packageSchema);
