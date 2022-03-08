@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
+const {Package} = require('../models');
 
-const db = require('../models');
 
-router.get("/packages", async (req, res) => {
+
+
+
+router.get("/", async (req, res) => {
   try {
     // send all people
     res.json(await Package.find({}));
@@ -14,76 +17,48 @@ router.get("/packages", async (req, res) => {
   }
 });
 
+router.post("/", async (req, res) => {
+  try {
 
-router.post('/', async(req, res, next ) =>{
-  try{
-    const createPackage = await db.Package.create(req.body)
-    console.log(createPackage);
-    
-    res.redirect("/packages");
-  }catch (error){
-    console.log(error);
-    req.error = error;
-    return next();
-  }
-  })
-  
-  router.get('/new', (req, res)=>{
-    res.render('new.ejs');
-  });
-  
-  router.get('/:packageId', async (req, res, next) => {
-    try {
-      const foundPackage = await db.Package.findById(req.params.packageId)
-      console.log(foundPackage);
-      context = {package_id: foundPackage}
-      res.redirect('show.ejs', context)
-  }catch (error){
-    console.log(error);
-    req.error = error;
-    return next();
-  }   
-});
-  
-  router.delete('/:packageId', async (req, res, next) => {
-    try {
-      const deletePackage = await DelayNode.Package.findByIdAndDelete(req.params.packageId);
-      console.log(deletePackage);
-
-      res.redirect('/packages')
-    }catch (error){
-    console.log(error);
-    req.error = error;
-    return next();
-  }   
-});
-  
-  router.get('/:packageId/edit',  async (req, res, next) => {
-    try {
-      const updatedPackage = await db.Package.findById(req.params.packageId);
-
-      console.log(updatedPackage);
-      return res.render('edit.ejs', { package: updatedPackage })
+    res.json(await Package.create(req.body));
   } catch (error) {
-      console.log(error);
-      req.error = error;
-      return next();
+
+    res.status(400).json(error);
   }
-})
-  
-  router.put('/:packageId',  async (req, res, next) => {
-
-    try {
-        const updatedPackage = await db.Package.findByIdAndUpdate(req.params.packageId, req.body);
-
-        console.log(updatedPackage);
-        return res.redirect('/packages');
-    } catch (error) {
-        console.log(error);
-        req.error = error;
-        return next();
-    }
 });
+
+router.put("/package:id", async (req, res) => {
+  try {
+    // send all people
+    res.json(
+      await Package.findByIdAndUpdate(req.params.id, req.body, { new: true })
+    );
+  } catch (error) {
+    //send error
+    res.status(400).json(error);
+  }
+});
+
+router.delete("/package:id", async (req, res) => {
+  try {
+    // send all people
+    res.json(await Package.findByIdAndRemove(req.params.id));
+  } catch (error) {
+    //send error
+    res.status(400).json(error);
+  }
+});
+
+router.get("/:packageid", async (req, res) => {
+  try {
+    res.json(await Package.findOne({ "_id": req.params.id }));
+  } catch (err) {
+    res.status(400).json(error);
+  }
+});
+
+
+
 
   
   module.exports = router;

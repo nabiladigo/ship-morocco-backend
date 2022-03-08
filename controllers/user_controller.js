@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcryptjs");
+
+// const bcrypt = require("bcryptjs");
 const { User } = require("../models/index");
 
 router.get("/register", function (req, res) {
-    return res.render("register");
+    return res.json("register");
 });
 
 router.post("/register", async function (req, res) {

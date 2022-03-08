@@ -1,30 +1,34 @@
 const mongoose = require('mongoose');
 
-const packageSchema = new mongoose.Schema({
-    title:{
-        type: String,
-        required: [true, 'name can not be empty']
+const packageSchema = new mongoose.Schema(
+    {
+        title:{
+            type: String,
+            required: [true, 'name can not be empty']
+        },
+        image:{
+            type: String,
+            // required: [true, 'image can not be empty']
+        },
+        price: {
+            type: Number,
+            min: [0, 'you can not add a negative number'],
+            // required: [true, 'price can not be empty'],
+        },
+        weight:{
+            type: Number,
+            min: [0, 'you can not add a negative number'],
+            required: [true, 'price can not be empty'],
+        },
+        trackingNumber:{
+            type: Number,
+            // required: true
+        },
     },
-    image:{
-        type: String,
-        // required: [true, 'image can not be empty']
-    },
-    price: {
-        type: Number,
-        min: [0, 'you can not add a negative number'],
-        // required: [true, 'price can not be empty'],
-    },
-    Weight:{
-        type: Number,
-        min: [0, 'you can not add a negative number'],
-        required: [true, 'price can not be empty'],
-    },
-    TrackingNumber:{
-        type: Number,
-        // required: true
+    {
+        timestamps :true,
     }
-
-});
+);
 
 const Package= mongoose.model('Package', packageSchema);
 module.exports = Package;
