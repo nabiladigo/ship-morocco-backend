@@ -21,7 +21,7 @@ const packageSchema = new mongoose.Schema(
             required: [true, 'price can not be empty'],
         },
         trackingNumber:{
-            type: Number,
+            type: String,
         },
         user: {
           type: String,

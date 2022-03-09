@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
+const { verify } = require("jsonwebtoken");
 const router = require("express").Router();
 const jwt =  require("jsonwebtoken");
-const { user } = require(".");
 
 const auth = require("../middleware/auth");
 const { User } = require("../models/index");
@@ -14,12 +14,6 @@ router.get('/',  async (req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-// router.get('/', async (req, res) => {
-// User.findById(req.user)
-//     .then(users => res.json({
-//         id: user._id,
-//         username: user.usename
-//     }))
 
 router.post('/signup', async (req, res) => {
     try{
@@ -67,15 +61,15 @@ router.post("/login", async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         
         if( user && isMatch){
-            const token = jwt.sign(
-                { user_id: user._id, email },
-                    process.env.TOKEN_KEY,
-                {
-                    expiresIn: "5h",
-                 }
-            );
-            // save user token
-            user.token = token;
+            // const token = jwt.sign(
+            //     { user_id: user._id, email },
+            //         process.env.TOKEN_KEY,
+            //     {
+            //         expiresIn: "5h",
+            //      }
+            // );
+            // // save user token
+            // user.token = token;
             // user
             // req.session.currentUser = {
             //     id: foundUser._id,
@@ -92,12 +86,14 @@ router.post("/login", async (req, res) => {
 });
 
 
+// ?need to verify my route is not working
+
 router.get("/logout", async (req, res) => {
     try {
         
         await req.session.destroy();
         //  res.clearCookie("session-id");
-        res.send("you logged out")
+        res.json("you logged out")
 
     } catch (error) {
         res.status(404).json(error);
@@ -122,6 +118,14 @@ router.delete("/:id", async (req, res)=>{
     res.json(await User.findByIdAndRemove(req.params.id));
   } catch (error) {
 
+    res.status(400).json(error);
+  }
+});
+
+router.get("/:id", async (req, res) => {
+  try {
+    res.json(await User.findById({ "_id": req.params.id }));
+  } catch (err) {
     res.status(400).json(error);
   }
 });

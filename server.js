@@ -3,11 +3,12 @@ const cors = require('cors');
 const morgan = require('morgan');
 const controllers = require('./controllers');
 
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
+
+// const session = require("express-session");
+// const MongoStore = require("connect-mongo");
 
 const app = express();
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
 // app.use(express.urlencoded({ extended: false }));
 app.use(cors()); // to prevent cors errors, open access to all origins
@@ -17,6 +18,7 @@ app.use('/packages', controllers.package);
 app.use('/user', controllers.user);
 
 // app.use("/", controllers.auth);
+
 // app.use(
 //   session({
 //     // where to store the sessions in mongodb
