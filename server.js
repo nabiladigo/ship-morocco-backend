@@ -1,7 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-const controllers = require('./controllers')
+const controllers = require('./controllers');
+
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
 
 const app = express();
 const PORT = 4000;
@@ -10,13 +13,24 @@ const PORT = 4000;
 app.use(cors()); // to prevent cors errors, open access to all origins
 app.use(express.json()); // parse json bodies
 app.use(morgan('dev')); // logging
-app.use('/packages', controllers.package)
-// app.use('/packages', routes.package)
-app.use('/user', controllers.user)
-// app.use("/user", routes.user)
-// app.use("/api/user", routes.user) why did he use api in here 
+app.use('/packages', controllers.package);
+app.use('/user', controllers.user);
 
-
+// app.use("/", controllers.auth);
+app.use(
+  session({
+    // where to store the sessions in mongodb
+    store: MongoStore.create({ mongoUrl: "mongodb://localhost:27017/Ship_To_Morocco" }),
+    // secret key is used to sign every cookie to say its is valid
+    secret: "super secret",
+    resave: false,
+    saveUninitialized: false,
+    // configure the experation of the cookie
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7 * 2, // two weeks
+    },
+  })
+);
 
 // routes
 

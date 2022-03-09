@@ -1,9 +1,12 @@
 const bcrypt = require("bcryptjs");
-const express = require("express");
-const { User } = require("../models/index");
+const router = require("express").Router();
+const jwt =  require("jsonwebtoken");
+const { user } = require(".");
+
+const auth = require("../middleware/auth");
+const { User } = require("../models");
 
 // JWT is used for stateless authentication mechanisms for users and providers, this means maintaining session is on the client-side instead of storing sessions on the server
-const router = express.Router();
 
 router.get('/',  async (req, res) => {
     User.find()
@@ -18,19 +21,40 @@ router.get('/',  async (req, res) => {
 //         username: user.usename
 //     }))
 
-router.post('/register', (req, res) => {
+router.post('/signup', async (req, res) => {
+    try{
+        const { username, email, password, image } = req.body;
+        if(!(username && email && password)){
+            res.status(400).json("Please fill out all fields")
+        }
 
-    const { username, email, password, image } = req.body;
+        const userExist = await User.findOne({email});
+        if(userExist){
+            res.status(409).json("User aleardy exist")
+        }
 
-    const newUser = new User({
-        username,
-        email,
-        password,
-        image,
-    });
-    newUser.save()
-    .then(() => res.json('user added!'))
-    .catch(err => res.status(400).json('Error: ' +err));
+        const User = await User.create({
+            username: username,
+            email: email,
+            password: password,
+            image: image,
+        });
+
+        const token = jwt.sign(
+            {user_id : user._id, email},
+            process.env.TOKEN_KEY,
+            {
+                expiresIn: "5H",
+            }
+        );
+        user.token = token;
+        res.status(201).json("user added!")
+    } catch (error) {
+        res.status(404).json(error);
+    }
+    // newUser.save()
+    // .then(() => res.json('user added!'))
+    // .catch(err => res.status(400).json('Error: ' +err));
 });
 
 
@@ -48,11 +72,11 @@ router.post("/login", async (req, res) => {
         if(!isMatch){
             res.status(400).json("Invalid login");
         }
-        // const sessUser = { id: user.id, username: user.username, email: user.email };
-        // req.session.user = sessUser;
-        res.json({ msg: " Logged In Successfully"
-        // , sessUser
-     });
+            req.session.currentUser = {
+                id: foundUser._id,
+                username: foundUser.username,
+            };
+        res.json({ msg: " Logged In Successfully", sessUser});
 
     } catch (error) {
     res.status(404).json(error);
