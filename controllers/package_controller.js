@@ -52,7 +52,6 @@ router.delete("/:id", async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  console.log(`The request is ${req}`)
   try {
     res.json(await Package.findOne({ "_id": req.params.id }));
   } catch (err) {

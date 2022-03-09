@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema(
         password: {
             type: String,
             required: [true, "Please Provide A Password"],
+            minlength: [3, "Password should be atleast 6 characters long"],  
         },
         username: { 
             type: String, 
@@ -21,7 +22,7 @@ const userSchema = new mongoose.Schema(
         },
         image:{
             type: String,
-            required: true,
+            // required: true,
             default: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
         },
     },

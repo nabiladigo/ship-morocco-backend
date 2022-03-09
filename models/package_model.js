@@ -23,11 +23,11 @@ const packageSchema = new mongoose.Schema(
         trackingNumber:{
             type: Number,
         },
-        //      user: {
-        //   type: mongoose.Schema.Types.ObjectId,
+        user: {
+          type: String,
         //   required: true,
-        //   ref: "User",
-        // },
+          ref: "User",
+        },
     },
     {
         timestamps :true,
