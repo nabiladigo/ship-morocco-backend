@@ -17,44 +17,49 @@ router.get('/',  async (req, res) => {
 
 router.post('/signup', async (req, res) => {
     try{
-        const { username, email, password, passwordConfi } = req.body;
+        const { username, email, password } = req.body;
         if(!(username || email || password)){
-            res.status(400).json("Please fill out all fields")
+            res.status(400).send("Please fill out all fields")
         }
         if (password.length < 6) {
-            return res.status(400).json( "Password must be at least 6 characters");
+            return res.status(400).send( "Password must be at least 6 characters");
         }
         // if (password !== passwordConfi) {
-        //     return res.status(400).json("Passwords do not match");
+        //     return res.status(400).send("Passwords do not match");
         // }
+        console.log(req.body);
 
         const userExist = await User.findOne({email});
         if(userExist){
-            res.status(409).json("User aleardy exist")
+            return res.status(409).send("User aleardy exist")
         }
 
         const newUser = new User({
             username,
             email,
             password,
-            image,
+            // image,
         });
-      
+        console.log(newUser);
          const userAdded = await newUser.save()
-        res.json(userAdded)
-    } catch{
-         res.status(400).json("Sign up error");
+
+        return res.send(userAdded)
+    } catch(err){
+        console.log(err.message)
+         return res.status(400).send("Sign up error");
     }
 });
 
 
 
-router.post("/login", async (req, res) => {
+router.get("/login", async (req, res) => {
     try{
 
         const { email, password } = req.body;
+
+        console.log(req.body);
         if(!email || !password){
-            res.status(400).json("Please fill out all fields");
+            return res.status(400).json("Please fill out all fields");
         }
 
         const user = await User.findOne({email: email});
@@ -80,8 +85,9 @@ router.post("/login", async (req, res) => {
             return res.status(200).json(" Logged In Successfully");
         }
 
-    } catch (error) {
-    res.status(404).json("Invalid Credentials");
+    } catch(err){
+        console.log(err.message)
+    return res.status(404).json("Invalid Credentials");
   }
 });
 

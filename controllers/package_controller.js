@@ -29,7 +29,7 @@ router.post("/", async (req, res) => {
 //     res.json()
 // })
 
-router.put("/:id", async (req, res) => {
+router.put("/edit/:id", async (req, res) => {
   try {
    
     res.json(
@@ -41,7 +41,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
   try {
     
     res.json(await Package.findByIdAndRemove(req.params.id));
