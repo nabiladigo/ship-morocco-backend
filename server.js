@@ -11,7 +11,25 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // app.use(express.urlencoded({ extended: false }));
-app.use(cors()); // to prevent cors errors, open access to all origins
+// let whitelist = ['http://localhost:3000']
+const corsOptions = {
+  origin: '*',
+}
+// function (origin, callback) {
+//     if (whitelist.indexOf(origin) !== -1) {
+//       callback(null, true)
+//     } else {
+//       callback(new Error('Not allowed by CORS'))
+//     }
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
+app.use(cors(corsOptions)); // to prevent cors errors, open access to all origins
 app.use(express.json()); // parse json bodies
 app.use(morgan('dev')); // logging
 app.use('/packages', controllers.package);
@@ -36,9 +54,9 @@ app.use('/user', controllers.user);
 
 // routes
 
-app.get('/', (req, res) => {
-    res.send("hello world");
-  });
+// app.get('/', (req, res) => {
+//     res.send("hello world");
+//   });
 
 app.get('/*', (req, res) => {
   const context = { error: req.error };

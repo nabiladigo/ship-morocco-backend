@@ -31,13 +31,21 @@ router.post("/", async (req, res) => {
 
 router.put("/edit/:id", async (req, res) => {
   try {
-   
-    res.json(
-      await Package.findByIdAndUpdate(req.params.id, req.body, { new: true })
+    const { image, price, title, weight } = req.body;
+    const package = await Package.findByIdAndUpdate(req.params.id,
+      {
+        $set: req.body,
+      },
+      {
+        new: true,
+      }
     );
-  } catch (error) {
-    
-    res.status(400).json(error);
+
+    const editedPackage = package.save();
+
+    return res.status(200).json(editedPackage);
+  } catch (err) {
+    return res.status(500).json(err);
   }
 });
 
