@@ -1,7 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const bodyParser = require("body-parser");
 const controllers = require('./controllers');
+
 
 
 // const session = require("express-session");
@@ -10,7 +12,10 @@ const controllers = require('./controllers');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// app.use(express.urlencoded({ extended: false }));
+
+const urlencodedParser = bodyParser.urlencoded({extended: false})
+app.use(bodyParser.json(), urlencodedParser);
+
 // let whitelist = ['http://localhost:3000']
 const corsOptions = {
   origin: '*',
@@ -21,6 +26,7 @@ const corsOptions = {
 //     } else {
 //       callback(new Error('Not allowed by CORS'))
 //     }
+
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
