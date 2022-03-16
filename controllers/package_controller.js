@@ -63,7 +63,7 @@ router.get("/:id", async (req, res) => {
   try {
     res.json(await Package.findOne({ "_id": req.params.id }));
   } catch (err) {
-    res.status(400).json(error);
+    res.status(400).json(err);
   }
 });
 

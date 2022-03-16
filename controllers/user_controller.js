@@ -1,9 +1,9 @@
-const bcrypt = require("bcrypt");
-const { verify } = require("jsonwebtoken");
+// const bcrypt = require("bcrypt");
+// const { verify } = require("jsonwebtoken");
 const router = require("express").Router();
-const jwt =  require("jsonwebtoken");
+// const jwt =  require("jsonwebtoken");
 
-const auth = require("../middleware/auth");
+// const auth = require("../middleware/auth");
 const { User } = require("../models/index");
 
 // JWT is used for stateless authentication mechanisms for users and providers, this means maintaining session is on the client-side instead of storing sessions on the server
